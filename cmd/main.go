@@ -8,6 +8,7 @@ import (
 	"math/rand"
 	"net/http"
 	"net/url"
+	"regexp"
 	"sync"
 	"time"
 	"urlshort/store"
@@ -153,7 +154,10 @@ func SubmitHandler(c echo.Context) error {
 
 	validUrl, err := ValidURL(url)
 	if err != nil {
-		return c.String(http.StatusBadRequest, err.Error())
+		back := `<h1> Invalid URL </h1>
+		<a href="/">Back and try again</a>
+		`
+		return c.HTML(http.StatusBadRequest, back)
 	}
 
 	var id string
@@ -191,20 +195,24 @@ func SubmitHandler(c echo.Context) error {
 	return c.HTML(http.StatusOK, html)
 }
 
-// Valid URL ...
 func ValidURL(s string) (string, error) {
 
-	parsedURL, err := url.Parse(s)
-
-	if err != nil || parsedURL.Host == "" {
-		s = "https://" + s
-
-		parsedURL, err = url.Parse(s)
-		if err != nil || parsedURL.Host == "" {
-			return "", err
+	parsedURL, err := url.ParseRequestURI(s)
+	if err == nil && (parsedURL.Scheme == "http" || parsedURL.Scheme == "https") && parsedURL.Host != "" {
+		match, _ := regexp.MatchString(`^[a-zA-Z0-9-]+\.[a-zA-Z]{2,}$`, parsedURL.Host)
+		if match {
+			return parsedURL.String(), nil
 		}
-
 	}
 
-	return parsedURL.String(), err
+	s = "https://" + s
+	parsedURL, err = url.ParseRequestURI(s)
+	if err == nil && (parsedURL.Scheme == "http" || parsedURL.Scheme == "https") && parsedURL.Host != "" {
+		match, _ := regexp.MatchString(`^[a-zA-Z0-9-]+\.[a-zA-Z]{2,}$`, parsedURL.Host)
+		if match {
+			return parsedURL.String(), nil
+		}
+	}
+
+	return "", fmt.Errorf("invalid URL: %s", s)
 }

@@ -5,6 +5,13 @@ go 1.24.0
 require github.com/labstack/echo/v4 v4.13.3
 
 require (
+	github.com/davecgh/go-spew v1.1.1 // indirect
+	github.com/pmezard/go-difflib v1.0.0 // indirect
+	github.com/stretchr/testify v1.10.0 // indirect
+	gopkg.in/yaml.v3 v3.0.1 // indirect
+)
+
+require (
 	github.com/a-h/parse v0.0.0-20250122154542-74294addb73e // indirect
 	github.com/a-h/templ v0.3.857 // indirect
 	github.com/andybalholm/brotli v1.1.0 // indirect
