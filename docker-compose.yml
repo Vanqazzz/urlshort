@@ -1,0 +1,40 @@
+
+
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:      
+      - "8080:8080"    
+    restart: unless-stopped
+    command: ["/urlshort", "--url", "localhost:8080"]
+    environment:
+       DATABASE_URL:  postgres://postgres:1234@db:5432/links?sslmode=disable
+    depends_on:
+      - db
+    networks:
+      - my-network  # Подключение к сети my-network
+
+  db:
+    image: postgres:latest
+    container_name: postgres_container
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: 1234
+      POSTGRES_DB: links
+    ports:
+      - "5432:5432"
+    restart: unless-stopped
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    networks:
+      - my-network  # Подключение к сети my-network
+
+# Определение сети в конце файла
+networks:
+  my-network:
+    driver: bridge
+
+volumes:
+  pgdata:

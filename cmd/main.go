@@ -8,6 +8,7 @@ import (
 	"math/rand"
 	"net/http"
 	"net/url"
+	"os"
 	"regexp"
 	"sync"
 	"time"
@@ -36,14 +37,14 @@ func init() {
 	flag.Parse()
 
 	var err error
-	db, err = sql.Open("postgres", "postgres://ivan:1234@localhost:5432/links?sslmode=disable")
+	db, err = sql.Open("postgres", os.Getenv("DATABASE_URL"))
 	if err != nil {
 		panic(fmt.Sprintf("Failed to connect to DATABASE:%v", err))
 	}
 
 	_, err = db.Exec(`
 	CREATE TABLE IF NOT EXISTS links(
-	id VARCHAR(256) PRIMARY KEY,
+	id VARCHAR(255) PRIMARY KEY,
 	url TEXT NOT NULL
 	)
 	`)
@@ -173,7 +174,7 @@ func SubmitHandler(c echo.Context) error {
 	linkMap[id] = &store.Link{Id: id, Url: validUrl}
 	linkMapMutex.Unlock()
 
-	if _, err := db.Exec("INSERT INTO links (id, url) VALUES ($1, $2)", id, url); err != nil {
+	if _, err := db.Exec("INSERT INTO links (id, url) VALUES ($1, $2)", id, validUrl); err != nil {
 		return fmt.Errorf("failed to save link to database: %v", err)
 	}
 
