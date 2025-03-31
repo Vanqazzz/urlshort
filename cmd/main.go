@@ -200,7 +200,7 @@ func ValidURL(s string) (string, error) {
 
 	parsedURL, err := url.ParseRequestURI(s)
 	if err == nil && (parsedURL.Scheme == "http" || parsedURL.Scheme == "https") && parsedURL.Host != "" {
-		match, _ := regexp.MatchString(`^[a-zA-Z0-9-]+\.[a-zA-Z]{2,}$`, parsedURL.Host)
+		match, _ := regexp.MatchString(`^([a-zA-Z0-9-]+\.)+[a-zA-Z]{2,}$`, parsedURL.Host)
 		if match {
 			return parsedURL.String(), nil
 		}
@@ -209,7 +209,7 @@ func ValidURL(s string) (string, error) {
 	s = "https://" + s
 	parsedURL, err = url.ParseRequestURI(s)
 	if err == nil && (parsedURL.Scheme == "http" || parsedURL.Scheme == "https") && parsedURL.Host != "" {
-		match, _ := regexp.MatchString(`^[a-zA-Z0-9-]+\.[a-zA-Z]{2,}$`, parsedURL.Host)
+		match, _ := regexp.MatchString(`^([a-zA-Z0-9-]+\.)+[a-zA-Z]{2,}$`, parsedURL.Host)
 		if match {
 			return parsedURL.String(), nil
 		}
